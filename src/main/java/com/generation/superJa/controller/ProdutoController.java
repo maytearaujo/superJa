@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.generation.superJa.model.Produto;
 import com.generation.superJa.repository.CategoriaRepository;
 import com.generation.superJa.repository.ProdutoRepository;
+import com.generation.superJa.service.ProdutoService;
 
 import jakarta.validation.Valid;
 
@@ -33,8 +34,10 @@ public class ProdutoController {
 	@Autowired
 	private ProdutoRepository produtoRepository;
 	
-
+	@Autowired
+	private ProdutoService produtoService;
 	
+
 	@Autowired
 	private CategoriaRepository categoriaRepository;
 	
@@ -62,9 +65,11 @@ public class ProdutoController {
 	
 	@PostMapping
 	public ResponseEntity<Produto>post(@Valid @RequestBody Produto produto){
-		if (categoriaRepository.existsById(produto.getCategoria().getId()))
+		if (categoriaRepository.existsById(produto.getCategoria().getId())) {
+			   produtoService.calcularDesconto(produto);
 			return ResponseEntity.status(HttpStatus.CREATED)
 					.body(produtoRepository.save(produto));
+		}
 			
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não existe!", null);
 	}
